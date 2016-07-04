@@ -35,17 +35,18 @@
 	
 *map最终生成的url是URIEncode加密的，格式为&account=solar&password=123456;
 #####发起请求
-	OkNet.singleton().with(request).callback(listener).get();
-	
-*注意发起get请求的方法是以get()方法结尾。
+	OkNet.singleton().with(request).callback(listener);
 
 ###post方式
 post方式请求body种类比较繁多，后面再介绍。
 #####发起请求
-	OkNet.singleton().with(request).callback(listener).post();
-
-*注意发起post请求的方法是以post()方法结尾。此处特殊解释一下，其实get()或post()暂时没有什么区别，只是一个友好的标记，后期版本可能会有差异性。OkNet的请求方式是get/post主要在于使用的是GetRequest/PostRequest生成的请求body。
-
+	OkNet.singleton().with(request).callback(listener);
+#####配置独立超时时间(本次请求有效，单位秒)
+	OkNet.singleton().with(request)
+	.connectTimeout(15)
+	.readTimeout(30)
+	.writeTimeout(20)
+	.callback(listener);
 #####表单提交
 
 	FormBody.Builder formBuilder = new FormBody.Builder
