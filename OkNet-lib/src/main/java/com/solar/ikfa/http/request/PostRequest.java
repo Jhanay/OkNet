@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,12 @@ public class PostRequest {
 
     public static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream;charset=utf-8");
     public static final MediaType MEDIA_TYPE_STRING = MediaType.parse("text/plain;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType MEDIA_TYPE_IMG = MediaType.parse("image/*");
     public static final MediaType MEDIA_TYPE_AUDIO = MediaType.parse("audio/*");
 
     private Request.Builder builder = new Request.Builder();
+    private Headers.Builder headers;
     private String url;
     private RequestBody requestBody;
     private Object tag;
@@ -53,14 +55,25 @@ public class PostRequest {
         return this;
     }
 
-    public PostRequest header(String name, String value) {
-        builder.header(name, value);
+    public PostRequest header(String key, String value) {
+        if (headers == null) {
+            headers = new Headers.Builder();
+        }
+        headers.set(key, value);
+        return this;
+    }
+
+    public PostRequest addHeader(String key, String value) {
+        if (headers == null) {
+            headers = new Headers.Builder();
+        }
+        headers.add(key, value);
         return this;
     }
 
     public PostRequest cacheControl(CacheControl cacheControl) {
-        builder.cacheControl(cacheControl);
-        return this;
+        String value = cacheControl.toString();
+        return header("Cache-Control", value);
     }
 
     public PostRequest tag(Object tag) {
@@ -76,6 +89,11 @@ public class PostRequest {
 
     public PostRequest strBuilder(String body) {
         requestBody = RequestBody.create(MEDIA_TYPE_STRING, body);
+        return this;
+    }
+
+    public PostRequest jsonBuilder(String body) {
+        requestBody = RequestBody.create(MEDIA_TYPE_JSON, body);
         return this;
     }
 
@@ -125,6 +143,9 @@ public class PostRequest {
 
     public Request create() {
         builder.url(url);
+        if (headers != null) {
+            builder.headers(headers.build());
+        }
         builder.post(requestBody);
         return builder.build();
     }

@@ -19,6 +19,7 @@ import android.os.Message;
 
 import java.io.IOException;
 
+import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -30,15 +31,14 @@ public abstract class StringCallback extends Callback {
      * @param response 转换成string
      */
     @Override
-    public void onResponse(Response response) {
-        super.onResponse(response);
-
+    public void onResponse(Call call, Response response) {
+        super.onResponse(call, response);
         try {
             String result = response.body().string();
             sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[]{result, response.request()}));
         } catch (IOException e) {
             e.printStackTrace();
-            sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, response.request(), response.code()}));
+            sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, call.request(), response.code()}));
         }
     }
 

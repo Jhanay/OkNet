@@ -24,11 +24,13 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import okhttp3.CacheControl;
+import okhttp3.Headers;
 import okhttp3.Request;
 
 public class GetRequest {
 
     private Request.Builder builder = new Request.Builder();
+    private Headers.Builder headers;
     private String url;
     private Object tag;
 
@@ -38,13 +40,24 @@ public class GetRequest {
     }
 
     public GetRequest header(String key, String value) {
-        builder.header(key, value);
+        if (headers == null) {
+            headers = new Headers.Builder();
+        }
+        headers.set(key, value);
+        return this;
+    }
+
+    public GetRequest addHeader(String key, String value) {
+        if (headers == null) {
+            headers = new Headers.Builder();
+        }
+        headers.add(key, value);
         return this;
     }
 
     public GetRequest cacheControl(CacheControl cacheControl) {
-        builder.cacheControl(cacheControl);
-        return this;
+        String value = cacheControl.toString();
+        return header("Cache-Control", value);
     }
 
     public GetRequest tag(Object tag) {
@@ -81,6 +94,9 @@ public class GetRequest {
 
     public Request create() {
         builder.url(url);
+        if (headers != null) {
+            builder.headers(headers.build());
+        }
         return builder.build();
     }
 

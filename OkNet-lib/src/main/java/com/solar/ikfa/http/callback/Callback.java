@@ -19,6 +19,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.solar.ikfa.http.exception.CancelException;
+import com.solar.ikfa.http.exception.NotFoundException;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -35,16 +38,7 @@ public abstract class Callback implements okhttp3.Callback {
     protected static final int RETRY_MESSAGE = 5;
     protected static final int CANCEL_MESSAGE = 6;
 
-    protected Handler handler;
-    private Looper looper;
-
-    public Callback() {
-        this(null);
-    }
-
-    public Callback(Looper looper) {
-        this.looper = looper == null ? Looper.myLooper() : looper;
-    }
+    private Handler handler;
 
     /**
      * 网络请求开始
@@ -65,13 +59,6 @@ public abstract class Callback implements okhttp3.Callback {
     public void onProgress(String params, long bytesRead, long contentLength, boolean done) {
     }
 
-    /**
-     * @param response 不在主线程,需要转换
-     */
-    public void onResponse(Response response) {
-        sendMessage(obtainMessage(FINISH_MESSAGE, new Object[]{response.request()}));
-    }
-
     protected void onFailure(Exception e, Request request, int code) {
         sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, request, code}));
         sendMessage(obtainMessage(FINISH_MESSAGE, new Object[]{request}));
@@ -87,7 +74,7 @@ public abstract class Callback implements okhttp3.Callback {
 
     protected void sendMessage(Message msg) {
         if (handler == null) {
-            handler = new ResponseHandler(this, looper);
+            handler = new MainHandler();
         }
         if (!Thread.currentThread().isInterrupted()) {
             handler.sendMessage(msg);
@@ -128,7 +115,7 @@ public abstract class Callback implements okhttp3.Callback {
 
     @Override
     public void onFailure(Call call, IOException e) {
-        onFailure(e, call.request(), -1);
+        onFailure(e, call.request(), -200);
     }
 
     /**
@@ -156,35 +143,38 @@ public abstract class Callback implements okhttp3.Callback {
      *                     用于处理 501 未实现(Not Implemented)错误。
      */
     @Override
-    public void onResponse(Call call, Response response) throws IOException {
-        if (response.code() >= 400 && response.code() <= 599) {
-            onFailure(new NotFoundException(response.code() + "error,server is not found."), response.request(), response.code());
-            return;
+    public void onResponse(Call call, Response response) {
+        try {
+            if (call.isCanceled()) {
+                onFailure(new CancelException("Request were canceled."), call.request(), -200);
+                return;
+            }
+            if (!response.isSuccessful()) {
+                onFailure(new NotFoundException(response.code() + "error,server is not found."), response.request(), response.code());
+                return;
+            }
+            //完成请求
+            sendMessage(obtainMessage(FINISH_MESSAGE, new Object[]{response.request()}));
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{e, call.request(), response.code()}));
         }
-        onResponse(response);
     }
 
     /**
      * Avoid leaks by using a non-anonymous handler class.
      */
-    private static class ResponseHandler extends Handler {
-        private final com.solar.ikfa.http.callback.Callback callback;
+    private class MainHandler extends Handler {
 
-        ResponseHandler(com.solar.ikfa.http.callback.Callback callback, Looper looper) {
-            super(looper);
-            this.callback = callback;
+        MainHandler() {
+            super(Looper.getMainLooper());
         }
 
         @Override
         public void handleMessage(Message msg) {
-            callback.handleMessage(msg);
+            com.solar.ikfa.http.callback.Callback.this.handleMessage(msg);
         }
     }
 
-    public class NotFoundException extends Exception {
 
-        public NotFoundException(String message) {
-            super(message);
-        }
-    }
 }

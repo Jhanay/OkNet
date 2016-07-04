@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.BufferedSink;
@@ -89,8 +90,8 @@ public abstract class FileCallback extends Callback {
 //    }
 //
     @Override
-    public void onResponse(Response response) {
-        super.onResponse(response);
+    public void onResponse(Call call, Response response) {
+        super.onResponse(call, response);
 
         BufferedSink sink = null;
         String url = response.request().url().toString();

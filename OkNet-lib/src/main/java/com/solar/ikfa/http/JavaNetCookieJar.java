@@ -26,14 +26,14 @@ import java.util.Map;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
-import okhttp3.internal.Internal;
+import okhttp3.internal.Platform;
 
-import static java.util.logging.Level.WARNING;
+import static okhttp3.internal.Platform.WARN;
 import static okhttp3.internal.Util.delimiterOffset;
 import static okhttp3.internal.Util.trimSubstring;
 
 /**
- * A cookie jar that delegates to a {@link CookieHandler}.
+ * A cookie jar that delegates to a {@link java.net.CookieHandler}.
  */
 public final class JavaNetCookieJar implements CookieJar {
     private final CookieHandler cookieHandler;
@@ -53,7 +53,7 @@ public final class JavaNetCookieJar implements CookieJar {
             try {
                 cookieHandler.put(url.uri(), multimap);
             } catch (IOException e) {
-                Internal.logger.log(WARNING, "Saving cookies failed for " + url.resolve("/..."), e);
+                Platform.get().log(WARN, "Saving cookies failed for " + url.resolve("/..."), e);
             }
         }
     }
@@ -66,7 +66,7 @@ public final class JavaNetCookieJar implements CookieJar {
         try {
             cookieHeaders = cookieHandler.get(url.uri(), headers);
         } catch (IOException e) {
-            Internal.logger.log(WARNING, "Loading cookies failed for " + url.resolve("/..."), e);
+            Platform.get().log(WARN, "Loading cookies failed for " + url.resolve("/..."), e);
             return Collections.emptyList();
         }
 
@@ -118,3 +118,4 @@ public final class JavaNetCookieJar implements CookieJar {
         return result;
     }
 }
+
