@@ -169,7 +169,7 @@ multi提交的案例主要包含：表单及文件，多个文件等
        postRequest.callback(this);
 	
 ~~~
-将callback付给request即可。
+将callback赋给request即可。
 
 #####取消网络请求
 在生命周期结束的时候，我们希望终止网络，避免网络回调引起的异常，可以执行如下语句：
