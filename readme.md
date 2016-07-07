@@ -1,19 +1,23 @@
 #OkNet
 **OkNet**是一个网络请求的工具类，是**OkHttp**的一个二次封装，所以具备**OkHttp**的所有优点。具体有哪些特性可以参考[OkHttp wiki](https://github.com/square/okhttp/wiki)。
 
+##Gradle配置
+
+	compile 'com.solar.ikfa:oknet:1.0.0'
+
 ##OkNet常用API介绍
 
 **OkNet**初始化：
 
 	OkNet.singleton();
 	
-采用单例模式生成实例，默认cookie策略为ACCEPT_NONE，连接时间10s，读时间30s，写时间20s。
+采用单例模式生成实例，默认cookie策略为ACCEPT_ALL，连接时间10s，读时间30s，写时间20s。
 可以在重新配置。实现如下:
 	
 	OkNet.singleton().newConfigure()
                 .connectTimeout(10).readTimeout(30).writeTimeout(20)
                 .cache(cacheDir, 50 * 1024 * 1024) //设置缓存位置和大小
-                .cookiePolicy(CookiePolicy.ACCEPT_ALL)
+                .cookiePolicy(CookiePolicy.ACCEPT_NONE)
                 .addInterceptor(interceptor)
                 .addNetworkInterceptor(interceptor)
                 .sslSocketFactory(sslSocketFactory) //设置私有https证书
@@ -178,7 +182,7 @@ multi提交的案例主要包含：表单及文件，多个文件等
 
 	
 #####结尾
-网络工具可能有未发现的bug，或者使用不够简便的地方，需要大家在平常使用中暴露出来，并优化。有更好的架构思路会去迭代更新。
+网络工具使用不够简便的地方，需要大家在平常使用中暴露出来，并优化。有更好的架构思路会去迭代更新。
 
 #####感谢
 [okhttp-utils](https://github.com/hongyangAndroid/okhttp-utils)

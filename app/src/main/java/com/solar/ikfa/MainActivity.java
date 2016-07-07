@@ -1,14 +1,9 @@
 package com.solar.ikfa;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.util.TimeUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 
 import com.solar.ikfa.http.OkNet;
@@ -16,9 +11,6 @@ import com.solar.ikfa.http.callback.Callback;
 import com.solar.ikfa.http.callback.StringCallback;
 import com.solar.ikfa.http.request.GetRequest;
 import com.solar.ikfa.http.request.PostRequest;
-
-import java.net.CookiePolicy;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
 import okhttp3.Request;
@@ -43,15 +35,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /**
-        OkNet.singleton().newConfigure()
-                .connectTimeout(10).readTimeout(30).writeTimeout(20)
-                .cache(cacheDir, 50 * 1024 * 1024) //设置缓存位置和大小
-                .cookiePolicy(CookiePolicy.ACCEPT_ALL)
-                .addInterceptor(interceptor)
-                .addNetworkInterceptor(interceptor)
-                .sslSocketFactory(sslSocketFactory) //设置私有https证书
-                .gzip()  //支持gzip解压数据
-                .config();
+         OkNet.singleton().newConfigure()
+         .connectTimeout(10).readTimeout(30).writeTimeout(20)
+         .cache(cacheDir, 50 * 1024 * 1024) //设置缓存位置和大小
+         .cookiePolicy(CookiePolicy.ACCEPT_ALL)
+         .addInterceptor(interceptor)
+         .addNetworkInterceptor(interceptor)
+         .sslSocketFactory(sslSocketFactory) //设置私有https证书
+         .gzip()  //支持gzip解压数据
+         .config();
          */
     }
 
@@ -87,10 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private void getExample() {
         String url = "http://www.baidu.com";
         Request request = new GetRequest().url(url).tag(this).create();
-        OkNet.singleton()
-                .with(request)
-                .callback(callback)
-                .get();
+        OkNet.singleton().with(request).callback(callback);
     }
 
     private void postExample() {
@@ -101,6 +90,6 @@ public class MainActivity extends AppCompatActivity {
                         .add("password", "123456"))
                 .tag(this)
                 .create();
-        OkNet.singleton().with(request).callback(callback).post();
+        OkNet.singleton().with(request).callback(callback);
     }
 }

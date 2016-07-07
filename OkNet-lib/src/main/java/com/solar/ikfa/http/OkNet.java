@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- * <p/>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -246,7 +246,7 @@ public class OkNet {
         /**
          * Sets the handler that can accept cookies from incoming HTTP responses and provides cookies to
          * outgoing HTTP requests.
-         * <p/>
+         *
          * <p>If unset, {@linkplain CookieJar#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Configure cookiePolicy(CookiePolicy cookiePolicy) {
@@ -260,7 +260,7 @@ public class OkNet {
          * Sets the socket factory used to create connections. OkHttp only uses the parameterless {@link
          * SocketFactory#createSocket() createSocket()} method to create unconnected sockets. Overriding
          * this method, e. g., allows the socket to be bound to a specific local address.
-         * <p/>
+         *
          * <p>If unset, the {@link SocketFactory#getDefault() system-wide default} socket factory will
          * be used.
          */
@@ -272,7 +272,7 @@ public class OkNet {
 
         /**
          * Sets the socket factory used to secure HTTPS connections.
-         * <p/>
+         *
          * <p>If unset, a lazily created SSL socket factory will be used.
          */
         public Configure sslSocketFactory(SSLSocketFactory sslSocketFactory) {
@@ -285,7 +285,7 @@ public class OkNet {
         /**
          * Sets the verifier used to confirm that response certificates apply to requested hostnames for
          * HTTPS connections.
-         * <p/>
+         *
          * <p>If unset, a default hostname verifier will be used.
          */
         public Configure hostnameVerifier(HostnameVerifier hostnameVerifier) {
@@ -310,7 +310,7 @@ public class OkNet {
         /**
          * Sets the authenticator used to respond to challenges from origin servers. Use {@link
          * #proxyAuthenticator} to set the authenticator for proxy servers.
-         * <p/>
+         *
          * <p>If unset, the {@linkplain Authenticator#NONE no authentication will be attempted}.
          */
         public Configure authenticator(Authenticator authenticator) {
@@ -322,7 +322,7 @@ public class OkNet {
         /**
          * Sets the authenticator used to respond to challenges from proxy servers. Use {@link
          * #authenticator} to set the authenticator for origin servers.
-         * <p/>
+         *
          * <p>If unset, the {@linkplain Authenticator#NONE no authentication will be attempted}.
          */
         public Configure proxyAuthenticator(Authenticator proxyAuthenticator) {
@@ -334,7 +334,7 @@ public class OkNet {
 
         /**
          * Sets the connection pool used to recycle HTTP and HTTPS connections.
-         * <p/>
+         *
          * <p>If unset, a new connection pool will be used.
          */
         public Configure connectionPool(ConnectionPool connectionPool) {

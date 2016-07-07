@@ -49,6 +49,7 @@ public abstract class Callback implements okhttp3.Callback {
 
     /**
      * 网络请求结束,包括请求成功,失败,异常完成
+     * @param request
      */
     public void onFinish(Request request) {
 
@@ -121,26 +122,26 @@ public abstract class Callback implements okhttp3.Callback {
     /**
      * @param call
      * @param response
-     * @throws IOException exception BadRequestException
-     *                     用于处理 400 错误的请求(Bad Request)错误。
-     *                     <p/>
-     *                     exception UnauthorizedException
-     *                     用于处理 401 未授权(Unauthorized)错误。
-     *                     <p/>
-     *                     exception ForbiddenException
-     *                     用于处理 403 禁止访问(Forbidden)错误。
-     *                     <p/>
-     *                     exception NotFoundException
-     *                     用于处理 404 未找到(Not found)错误。
-     *                     <p/>
-     *                     exception MethodNotAllowedException
-     *                     用于处理 405 方法不被允许(Method Not Allowed)错误。
-     *                     <p/>
-     *                     exception InternalErrorException
-     *                     用于处理 500 内部服务器错误(Internal Server Error)。
-     *                     <p/>
-     *                     exception NotImplementedException
-     *                     用于处理 501 未实现(Not Implemented)错误。
+     * 异常说明:  exception BadRequestException
+     *           用于处理 400 错误的请求(Bad Request)错误。
+     *
+     *           exception UnauthorizedException
+     *           用于处理 401 未授权(Unauthorized)错误。
+     *
+     *           exception ForbiddenException
+     *           用于处理 403 禁止访问(Forbidden)错误。
+     *
+     *           exception NotFoundException
+     *           用于处理 404 未找到(Not found)错误。
+     *
+     *           exception MethodNotAllowedException
+     *           用于处理 405 方法不被允许(Method Not Allowed)错误。
+     *
+     *           exception InternalErrorException
+     *           用于处理 500 内部服务器错误(Internal Server Error)。
+     *
+     *           exception NotImplementedException
+     *           用于处理 501 未实现(Not Implemented)错误。
      */
     @Override
     public void onResponse(Call call, Response response) {

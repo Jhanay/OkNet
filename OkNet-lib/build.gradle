@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.novoda.bintray-release'
 
 
 group = 'com.solar.ikfa'
@@ -22,62 +21,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
 
-def siteUrl = 'https://github.com/jhanay/OkNet'
-def gitUrl = 'https://github.com/jhanay/OkNet.git'
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-
-    user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
-
-    configurations = ['archives'] //When uploading configuration files
-    pkg {
-        repo = 'maven'
-        name = 'oknet'//project.name
-        desc = 'oknet'
-        websiteUrl = siteUrl
-//        issueTrackerUrl = 'https://github.com/bintray/bintray-examples/issues'
-        vcsUrl = gitUrl
-        licenses = ['Apache-2.0']
-        labels = ['aar', 'android', 'example']
-        publicDownloadNumbers = true
+    lintOptions{
+        abortOnError false
+        warning 'InvalidPackage'
     }
 }
 
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name 'oknet'
-                url siteUrl
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'priscilla'
-                        name 'priscilla'
-                        email 'mmpriscilla@qq.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-
-                }
-            }
-        }
-    }
+task clearJar(type: Delete) {
+    delete 'build/outputs/oknet.jar'
 }
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('build/outputs/')
+    include('classes.jar')
+    rename ('classes.jar', 'oknet-1_0_0.jar')
+}
+
+makeJar.dependsOn(clearJar, build)
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -88,26 +50,11 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.1'
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-task findConventions << {
-    println project.getConvention()
+publish {
+    userOrg = 'jhanay' //bintray.com用户名
+    groupId = 'com.solar.ikfa' //jcenter上的路径
+    artifactId = 'oknet' //项目名称
+    publishVersion = '1.0.0' //版本号
+    desc = 'Oh hi, this is a nice description for a project, right?'
+    website = 'https://github.com/jhanay/OkNet'
 }
