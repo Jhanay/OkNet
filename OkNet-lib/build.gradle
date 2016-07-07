@@ -36,7 +36,7 @@ task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename ('classes.jar', 'oknet-1_0_0.jar')
+    rename ('classes.jar', 'oknet-1_0_1.jar')
 }
 
 makeJar.dependsOn(clearJar, build)

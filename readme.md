@@ -3,7 +3,7 @@
 
 ##Gradle配置
 
-	compile 'com.solar.ikfa:oknet:1.0.0'
+	compile 'com.solar.ikfa:oknet:1.0.1'
 
 ##OkNet常用API介绍
 
