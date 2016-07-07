@@ -54,7 +54,7 @@ publish {
     userOrg = 'jhanay' //bintray.com用户名
     groupId = 'com.solar.ikfa' //jcenter上的路径
     artifactId = 'oknet' //项目名称
-    publishVersion = '1.0.0' //版本号
+    publishVersion = '1.0.1' //版本号
     desc = 'Oh hi, this is a nice description for a project, right?'
     website = 'https://github.com/jhanay/OkNet'
 }
