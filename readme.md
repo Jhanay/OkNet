@@ -106,7 +106,7 @@ multi提交的案例主要包含：表单及文件，多个文件等
             }
 	}
 	
-	GsonCallback  callback = new GsonCallback<Result<User>>() {
+	JsonCallback  callback = new JsonCallback<Result<User>>() {
 
             @Override
             public void onStart() {
