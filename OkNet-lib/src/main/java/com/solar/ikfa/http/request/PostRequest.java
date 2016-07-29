@@ -74,12 +74,11 @@ public class PostRequest {
 
     public PostRequest cacheControl(CacheControl cacheControl) {
         String value = cacheControl.toString();
-        return header("Cache-Control", value);
+        return addHeader("Cache-Control", value);
     }
 
     public PostRequest tag(Object tag) {
         this.tag = tag;
-        builder.tag(tag);
         return this;
     }
 
@@ -144,6 +143,7 @@ public class PostRequest {
 
     public Request create() {
         builder.url(url);
+        builder.tag(tag);
         if (headers != null) {
             builder.headers(headers.build());
         }

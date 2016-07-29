@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,11 +57,11 @@ public class GetRequest {
 
     public GetRequest cacheControl(CacheControl cacheControl) {
         String value = cacheControl.toString();
-        return header("Cache-Control", value);
+        return addHeader("Cache-Control", value);
     }
 
     public GetRequest tag(Object tag) {
-        builder.tag(tag);
+        this.tag = tag;
         return this;
     }
 
@@ -94,6 +94,7 @@ public class GetRequest {
 
     public Request create() {
         builder.url(url);
+        builder.tag(tag);
         if (headers != null) {
             builder.headers(headers.build());
         }

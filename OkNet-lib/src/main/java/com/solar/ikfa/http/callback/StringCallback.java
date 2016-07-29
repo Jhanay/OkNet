@@ -18,8 +18,6 @@ package com.solar.ikfa.http.callback;
 import android.os.Message;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Request;
@@ -36,7 +34,7 @@ public abstract class StringCallback extends Callback {
     public void onResponse(Call call, Response response) {
         super.onResponse(call, response);
         try {
-            String result = replaceBlank(response.body().string());
+            String result = response.body().string();
             sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[]{result, response.request()}));
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,15 +52,5 @@ public abstract class StringCallback extends Callback {
                 onSuccess((String) objects[0], (Request) objects[1]);
                 break;
         }
-    }
-
-    public String replaceBlank(String str) {
-        String dest = "";
-        if (str != null) {
-            Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-            Matcher m = p.matcher(str);
-            dest = m.replaceAll("");
-        }
-        return dest;
     }
 }

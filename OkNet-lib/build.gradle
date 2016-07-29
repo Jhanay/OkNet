@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.3"
     }
     buildTypes {
         release {
@@ -32,7 +32,7 @@ task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename ('classes.jar', 'oknet-1_0_2.jar')
+    rename ('classes.jar', 'oknet-1_0_3.jar')
 }
 
 makeJar.dependsOn(clearJar, build)
@@ -50,7 +50,7 @@ publish {
     userOrg = 'jhanay' //bintray.com用户名
     groupId = 'com.solar.ikfa' //jcenter上的路径
     artifactId = 'oknet' //项目名称
-    publishVersion = '1.0.2' //版本号
+    publishVersion = '1.0.3' //版本号
     desc = 'Oh hi, this is a nice description for a project, right?'
     website = 'https://github.com/jhanay/OkNet'
 }

@@ -12,6 +12,9 @@ import com.solar.ikfa.http.callback.StringCallback;
 import com.solar.ikfa.http.request.GetRequest;
 import com.solar.ikfa.http.request.PostRequest;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import okhttp3.FormBody;
 import okhttp3.Request;
 
@@ -42,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
          .addInterceptor(interceptor)
          .addNetworkInterceptor(interceptor)
          .sslSocketFactory(sslSocketFactory) //设置私有https证书
-         .gzip()  //支持gzip解压数据
          .config();
          */
     }
@@ -50,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
     Callback callback = new StringCallback() {
         @Override
         public void onSuccess(String result, Request request) {
-            System.out.print(result);
+            System.out.print("result:" + result);
         }
 
         @Override
         public void onError(Exception e, Request request, int code) {
-
+            System.out.print("code:" + code);
         }
 
         @Override

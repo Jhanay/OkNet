@@ -3,7 +3,7 @@
 
 ##Gradle配置
 
-	compile 'com.solar.ikfa:oknet:1.0.2'
+	compile 'com.solar.ikfa:oknet:1.0.3'
 
 ##OkNet常用API介绍
 
@@ -21,7 +21,6 @@
                 .addInterceptor(interceptor)
                 .addNetworkInterceptor(interceptor)
                 .sslSocketFactory(sslSocketFactory) //设置私有https证书
-                .gzip()  //支持gzip解压数据
                 .config();
 	
 *注意此方法需要在application中初始化，另外不要忘记注册该application。
@@ -79,7 +78,7 @@ multi提交的案例主要包含：表单及文件，多个文件等
 	String mediaType = PostRequest.guessMediaType(fileName);
 	
 #####回调函数Callback
-上述get/post提交数据返回采用回调方式。callback返回类型主要有**StringCallback**文本返回，**GsonCallback<T>**对象返回，**FileCallback**文件返回。
+上述get/post提交数据返回采用回调方式。callback返回类型主要有**StringCallback**文本返回，**JsonCallback<T>**对象返回，**FileCallback**文件返回。
 下面是返回的例子:
 
 ~~~
@@ -163,7 +162,7 @@ multi提交的案例主要包含：表单及文件，多个文件等
 
 ~~~
 	new PostRequest()...
-		.callback(fileCallback);
+		.callback(callback);
 		或
 	在callback的onStart()方法中添加：
        postRequest.callback(this);
