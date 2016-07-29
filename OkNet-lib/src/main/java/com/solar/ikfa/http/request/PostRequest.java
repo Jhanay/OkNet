@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,8 @@ import okhttp3.RequestBody;
 public class PostRequest {
 
     public static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream;charset=utf-8");
-    public static final MediaType MEDIA_TYPE_STRING = MediaType.parse("text/plain;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_PLAIN = MediaType.parse("text/plain;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_FORM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType MEDIA_TYPE_IMG = MediaType.parse("image/*");
     public static final MediaType MEDIA_TYPE_AUDIO = MediaType.parse("audio/*");
@@ -88,7 +89,7 @@ public class PostRequest {
     }
 
     public PostRequest strBuilder(String body) {
-        requestBody = RequestBody.create(MEDIA_TYPE_STRING, body);
+        requestBody = RequestBody.create(MEDIA_TYPE_FORM, body);
         return this;
     }
 
@@ -251,7 +252,7 @@ public class PostRequest {
 
     @Deprecated
     private Request buildStringRequest(String url, String bodyStr, Object... tag) {
-        RequestBody body = RequestBody.create(MEDIA_TYPE_STRING, bodyStr);
+        RequestBody body = RequestBody.create(MEDIA_TYPE_PLAIN, bodyStr);
         Request.Builder builder = new Request.Builder();
         builder.url(url);
         builder.post(body);

@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package com.solar.ikfa.http;
 
 import com.solar.ikfa.http.callback.Callback;
+import com.solar.ikfa.http.interceptor.ProgressInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,27 +39,21 @@ import okhttp3.CertificatePinner;
 import okhttp3.ConnectionPool;
 import okhttp3.CookieJar;
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
-import okio.BufferedSink;
-import okio.GzipSink;
-import okio.Okio;
 
 public class OkNet {
 
     private static OkNet singleton;
     private static OkHttpClient client = new OkHttpClient();
-
-    private Map<Object, Callback> callbackMap = Collections.synchronizedMap(new WeakHashMap<Object, Callback>());
+    public static Map<Object, Callback> CALLBACK = Collections.synchronizedMap(new WeakHashMap<Object, Callback>());
 
     private OkNet() {
         OkHttpClient.Builder builder = client.newBuilder();
 
         CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_NONE);
         builder.cookieJar(new JavaNetCookieJar(cookieManager));
         builder.hostnameVerifier(new HostnameVerifier() {
             @Override
@@ -107,7 +102,7 @@ public class OkNet {
     }
 
     private synchronized void sendAsyncRequest(final OkHttpClient client, final Request request, final Callback callback) {
-        callbackMap.put(request.tag() == null ? request : request.tag(), callback);
+        CALLBACK.put(request.tag() == null ? request : request.tag(), callback);
 
         if (callback != null) {
             callback.onStart();
@@ -186,7 +181,7 @@ public class OkNet {
         OkHttpClient.Builder builder;
 
         public Configure() {
-            builder = client.newBuilder();
+            builder = new OkHttpClient.Builder();
         }
 
         public Configure cache(File cacheDir, long cacheSize) {
@@ -207,11 +202,6 @@ public class OkNet {
                             .build();
                 }
             });
-            return this;
-        }
-
-        public Configure gzip() {
-            builder.addInterceptor(new GzipRequestInterceptor());
             return this;
         }
 
@@ -246,7 +236,7 @@ public class OkNet {
         /**
          * Sets the handler that can accept cookies from incoming HTTP responses and provides cookies to
          * outgoing HTTP requests.
-         *
+         * <p>
          * <p>If unset, {@linkplain CookieJar#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Configure cookiePolicy(CookiePolicy cookiePolicy) {
@@ -260,7 +250,7 @@ public class OkNet {
          * Sets the socket factory used to create connections. OkHttp only uses the parameterless {@link
          * SocketFactory#createSocket() createSocket()} method to create unconnected sockets. Overriding
          * this method, e. g., allows the socket to be bound to a specific local address.
-         *
+         * <p>
          * <p>If unset, the {@link SocketFactory#getDefault() system-wide default} socket factory will
          * be used.
          */
@@ -272,7 +262,7 @@ public class OkNet {
 
         /**
          * Sets the socket factory used to secure HTTPS connections.
-         *
+         * <p>
          * <p>If unset, a lazily created SSL socket factory will be used.
          */
         public Configure sslSocketFactory(SSLSocketFactory sslSocketFactory) {
@@ -285,7 +275,7 @@ public class OkNet {
         /**
          * Sets the verifier used to confirm that response certificates apply to requested hostnames for
          * HTTPS connections.
-         *
+         * <p>
          * <p>If unset, a default hostname verifier will be used.
          */
         public Configure hostnameVerifier(HostnameVerifier hostnameVerifier) {
@@ -310,7 +300,7 @@ public class OkNet {
         /**
          * Sets the authenticator used to respond to challenges from origin servers. Use {@link
          * #proxyAuthenticator} to set the authenticator for proxy servers.
-         *
+         * <p>
          * <p>If unset, the {@linkplain Authenticator#NONE no authentication will be attempted}.
          */
         public Configure authenticator(Authenticator authenticator) {
@@ -322,7 +312,7 @@ public class OkNet {
         /**
          * Sets the authenticator used to respond to challenges from proxy servers. Use {@link
          * #authenticator} to set the authenticator for origin servers.
-         *
+         * <p>
          * <p>If unset, the {@linkplain Authenticator#NONE no authentication will be attempted}.
          */
         public Configure proxyAuthenticator(Authenticator proxyAuthenticator) {
@@ -334,7 +324,7 @@ public class OkNet {
 
         /**
          * Sets the connection pool used to recycle HTTP and HTTPS connections.
-         *
+         * <p>
          * <p>If unset, a new connection pool will be used.
          */
         public Configure connectionPool(ConnectionPool connectionPool) {
@@ -357,67 +347,6 @@ public class OkNet {
             return singleton;
         }
 
-    }
-
-    //下载进度拦截器
-    public class ProgressInterceptor implements Interceptor {
-
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            final okhttp3.Request request = chain.request();
-            final okhttp3.Response originalResponse = chain.proceed(request);
-
-            return originalResponse.newBuilder().body(new ProgressResponseBody(originalResponse.body(), new ProgressListener() {
-
-                @Override
-                public void onProgress(long bytesRead, long contentLength, boolean done) {
-                    if (contentLength != -1) {
-//                        System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
-                        callbackMap.get(request.tag()).download(request.url().toString(), bytesRead, contentLength, done);
-                        if (done) {
-                            callbackMap.remove(request.tag());
-                        }
-                    }
-                }
-            })).build();
-        }
-    }
-
-    public static class GzipRequestInterceptor implements Interceptor {
-        @Override
-        public Response intercept(Chain chain) throws IOException {
-            Request originalRequest = chain.request();
-            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
-                return chain.proceed(originalRequest);
-            }
-
-            Request compressedRequest = originalRequest.newBuilder()
-                    .header("Content-Encoding", "gzip")
-                    .method(originalRequest.method(), gzip(originalRequest.body()))
-                    .build();
-            return chain.proceed(compressedRequest);
-        }
-
-        private RequestBody gzip(final RequestBody body) {
-            return new RequestBody() {
-                @Override
-                public MediaType contentType() {
-                    return body.contentType();
-                }
-
-                @Override
-                public long contentLength() {
-                    return -1; // We don't know the compressed length in advance!
-                }
-
-                @Override
-                public void writeTo(BufferedSink sink) throws IOException {
-                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
-                    body.writeTo(gzipSink);
-                    gzipSink.close();
-                }
-            };
-        }
     }
 
 }

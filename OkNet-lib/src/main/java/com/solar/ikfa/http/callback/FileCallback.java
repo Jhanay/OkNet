@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 priscilla
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,8 +42,8 @@ public abstract class FileCallback extends Callback {
      * @param response 转换成file
      */
 //    @Override
-//    public void onResponse(Response response) {
-//        super.onResponse(response);
+//    public void onResponse(Call call, Response response) {
+//        super.onResponse(call, response);
 //
 //        InputStream is = null;
 //        FileOutputStream fos = null;
@@ -59,7 +59,7 @@ public abstract class FileCallback extends Callback {
 //            if (!dir.exists()) {
 //                dir.mkdirs();
 //            }
-//            String url = response.request().urlString();
+//            String url = response.request().url().url().toString();
 //            File file = new File(dir, getFileName(url));
 //
 //            is = response.body().byteStream();
@@ -67,7 +67,7 @@ public abstract class FileCallback extends Callback {
 //            while ((len = is.read(buf)) != -1) {
 //                bytesRead += len;
 //                fos.write(buf, 0, len);
-//                download(response.request().urlString(), bytesRead, contentLength, bytesRead == contentLength);
+//                download(response.request().url().url().toString(), bytesRead, contentLength, bytesRead == contentLength);
 //            }
 //            fos.flush();
 //            sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[]{file.getAbsolutePath(), response.request()}));
@@ -88,7 +88,7 @@ public abstract class FileCallback extends Callback {
 //            }
 //        }
 //    }
-//
+
     @Override
     public void onResponse(Call call, Response response) {
         super.onResponse(call, response);
