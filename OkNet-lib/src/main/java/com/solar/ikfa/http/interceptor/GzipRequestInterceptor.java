@@ -13,7 +13,6 @@ import okio.Okio;
 
 /**
  * @author wujunjie
- * @date 16/7/29
  */
 public class GzipRequestInterceptor implements Interceptor {
     @Override

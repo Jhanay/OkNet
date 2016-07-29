@@ -11,7 +11,6 @@ import okhttp3.Response;
 
 /**
  * @author wujunjie
- * @date 16/7/29
  */
 public class ProgressInterceptor implements Interceptor {
 
