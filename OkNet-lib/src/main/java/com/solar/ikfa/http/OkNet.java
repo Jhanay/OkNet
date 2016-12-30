@@ -15,16 +15,16 @@
  */
 package com.solar.ikfa.http;
 
-import com.solar.ikfa.http.callback.Callback;
-import com.solar.ikfa.http.interceptor.ProgressInterceptor;
+import com.solar.ikfa.http.builder.DownloadBuilder;
+import com.solar.ikfa.http.builder.GetBuilder;
+import com.solar.ikfa.http.builder.PatchBuilder;
+import com.solar.ikfa.http.builder.PostBuilder;
+import com.solar.ikfa.http.builder.PutBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
@@ -40,14 +40,12 @@ import okhttp3.ConnectionPool;
 import okhttp3.CookieJar;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class OkNet {
 
     private static OkNet singleton;
     private static OkHttpClient client = new OkHttpClient();
-    public static Map<Object, Callback> CALLBACK = Collections.synchronizedMap(new WeakHashMap<Object, Callback>());
 
     private OkNet() {
         OkHttpClient.Builder builder = client.newBuilder();
@@ -61,7 +59,6 @@ public class OkNet {
                 return true;
             }
         });
-        builder.addNetworkInterceptor(new ProgressInterceptor());
 
         builder.connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -81,15 +78,31 @@ public class OkNet {
         return singleton;
     }
 
+    public GetBuilder get() {
+        return new GetBuilder(this);
+    }
+
+    public PatchBuilder patch() {
+        return new PatchBuilder(this);
+    }
+
+    public PutBuilder put() {
+        return new PutBuilder(this);
+    }
+
+    public PostBuilder post() {
+        return new PostBuilder(this);
+    }
+
+    public DownloadBuilder download() {
+        return new DownloadBuilder(this);
+    }
+
     /**
      * @return 构造新的client
      */
     public Configure newConfigure() {
         return new Configure();
-    }
-
-    public Builder with(Request request) {
-        return new Builder(request);
     }
 
     public void cancel(Object tag) {
@@ -101,83 +114,11 @@ public class OkNet {
         }
     }
 
-    private synchronized void sendAsyncRequest(final OkHttpClient client, final Request request, final Callback callback) {
-        CALLBACK.put(request.tag() == null ? request : request.tag(), callback);
-
-        if (callback != null) {
-            callback.onStart();
-            client.newCall(request).enqueue(callback);
-        }
-    }
-
     public OkHttpClient client() {
         return client;
     }
 
-    public final class Builder {
-
-        private Request request;
-        private long connectTimeout;
-        private long readTimeout;
-        private long writeTimeout;
-        private OkHttpClient.Builder innerBuilder;
-
-        public Builder(Request request) {
-            this.request = request;
-        }
-
-        public Builder connectTimeout(long timeout) {
-            this.connectTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Sets the default read timeout for new connections. A value of 0 means no timeout, otherwise
-         * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
-         */
-        public Builder readTimeout(long timeout) {
-            this.readTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Sets the default write timeout for new connections. A value of 0 means no timeout, otherwise
-         * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
-         */
-        public Builder writeTimeout(long timeout) {
-            this.writeTimeout = timeout;
-            return this;
-        }
-
-        public void callback(Callback callback) {
-            if (request == null) {
-                throw new IllegalArgumentException("request is null");
-            }
-            if (callback == null) {
-                throw new IllegalArgumentException("callback is null");
-            }
-
-            if (connectTimeout > 0 || readTimeout > 0 || writeTimeout > 0) {
-                innerBuilder = client.newBuilder();
-                if (connectTimeout > 0) {
-                    innerBuilder.readTimeout(connectTimeout, TimeUnit.MILLISECONDS);
-                }
-                if (readTimeout > 0) {
-                    innerBuilder.readTimeout(readTimeout, TimeUnit.MILLISECONDS);
-                }
-                if (writeTimeout > 0) {
-                    innerBuilder.readTimeout(writeTimeout, TimeUnit.MILLISECONDS);
-                }
-            }
-            if (innerBuilder == null) {
-                sendAsyncRequest(client, request, callback);
-            } else {
-                sendAsyncRequest(innerBuilder.build(), request, callback);
-            }
-        }
-    }
-
-    public static final class Configure {
+    public final class Configure {
         OkHttpClient.Builder builder;
 
         public Configure() {

@@ -1,19 +1,17 @@
 package com.solar.ikfa;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
 import com.solar.ikfa.http.OkNet;
-import com.solar.ikfa.http.callback.Callback;
-import com.solar.ikfa.http.callback.StringCallback;
-import com.solar.ikfa.http.request.GetRequest;
-import com.solar.ikfa.http.request.PostRequest;
+import com.solar.ikfa.http.response.DownloadResponseHandler;
+import com.solar.ikfa.http.response.RawResponseHandler;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.File;
 
 import okhttp3.FormBody;
 import okhttp3.Request;
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getExample();
+                download();
             }
         });
 
@@ -49,26 +47,24 @@ public class MainActivity extends AppCompatActivity {
          */
     }
 
-    Callback callback = new StringCallback() {
+    RawResponseHandler responseHandler = new RawResponseHandler() {
         @Override
-        public void onSuccess(String result, Request request) {
+        public void onSuccess(Request request, String result) {
             System.out.print("result:" + result);
         }
 
         @Override
-        public void onError(Exception e, Request request, int code) {
+        public void onFailure(Request request, int code, Exception e) {
             System.out.print("code:" + code);
         }
 
         @Override
         public void onStart() {
-            super.onStart();
             //TODO showDialog
         }
 
         @Override
         public void onFinish(Request request) {
-            super.onFinish(request);
             //TODO dismissDialog
         }
 
@@ -80,18 +76,53 @@ public class MainActivity extends AppCompatActivity {
 
     private void getExample() {
         String url = "http://www.baidu.com";
-        Request request = new GetRequest().url(url).tag(this).create();
-        OkNet.singleton().with(request).callback(callback);
+//        Request request = new GetRequest().url(url).tag(this).create();
+//        OkNet.singleton().with(request).callback(callback);
+
+        OkNet.singleton().get().url(url).tag(this).enqueue(responseHandler);
     }
 
     private void postExample() {
         String url = "";
-        Request request = new PostRequest().url(url)
-                .formBuilder(new FormBody.Builder()
+        OkNet.singleton().post()
+                .form(new FormBody.Builder()
                         .add("account", "solar")
                         .add("password", "123456"))
                 .tag(this)
-                .create();
-        OkNet.singleton().with(request).callback(callback);
+                .enqueue(responseHandler);
+    }
+
+    private void download() {
+        String url = "http://gdown.baidu.com/data/wisegame/df65a597122796a4/weixin_821.apk";
+        String filePath = Environment.getExternalStorageDirectory() + File.separator + "weixin_821.apk";
+        System.out.println("filePath:" + filePath);
+        OkNet.singleton().download().url(url).filePath(Environment.getExternalStorageDirectory() + File.separator + "weixin_821.apk")
+                .tag(this).enqueue(new DownloadResponseHandler() {
+            @Override
+            public void onStart() {
+                System.out.println("onStart:::::");
+            }
+
+            @Override
+            public void onFinish(Request request) {
+                System.out.println("onFinish:::::");
+            }
+
+            @Override
+            public void onFailure(Request request, int code, Exception e) {
+                System.out.println("onFailure:::::");
+            }
+
+            @Override
+            public void onProgress(String fileName, long bytesRead, long contentLength, boolean done) {
+                System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
+            }
+
+            @Override
+            public void onSuccess(Request request, String result) {
+                System.out.println("onSuccess:::::" + result);
+            }
+        });
+
     }
 }
